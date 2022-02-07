@@ -10,6 +10,8 @@ function App() {
   const user = useSelector((state) => state.user.user)
   const dispatch = useDispatch()
 
+  // Using redux/redux saga is necessary for large applications
+  // However, a smaller app with 1 or 2 api calls, just using useEffect in combination with express is acceptable
   useEffect(() => {
     dispatch(getUser())
   }, [dispatch])
