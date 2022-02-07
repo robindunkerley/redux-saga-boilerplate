@@ -1,0 +1,19 @@
+Step 1
+
+    useEffect in App.js dispatches the getUser() action defined in ducks/user.js
+
+Step 2
+
+    Redux-saga is set up so that it watches for any actions that are dispatched
+
+    When it does, our watcherSaga function in rootSaga.js, watches for specific actions, and map it to its handler functions
+
+Step 3
+
+    handlegetUser() is called, which calls requestgetUser() which makes the api call
+    
+    The response from requestGetUser() / the API call, is returned to our handler function, which then sets that data back into our Redux store
+
+Step 4
+
+    Since the data is in our Redux store, we are able to access it within any component in our app.

@@ -1,0 +1,172 @@
+Step 1
+
+    npm install redux and react-redux
+    import {provider} from 'react-redux' in your index.js - the app component must be wrapped within this provider component - however this can be done later as it will error until your store is configured
+
+Step 2
+
+    Create 'redux' folder and 'ducks' folder
+
+Step 3 
+
+    Within your 'ducks' folder create your reducers - e.g. the files that configure the state and what you want to do with it
+
+    Basic counter ounter reducer setup file is like so...
+
+        const INCREMENT = 'increment';
+        const DECREMENT = 'decrement'
+
+        export const increment = () => ({
+            type: INCREMENT
+        })
+
+        export const decrement = () => ({
+            type: DECREMENT
+        })
+
+        const initialState = {
+            count: 0
+        };
+
+        export default (state = initialState, action) => {
+            switch(action.type) {
+                case INCREMENT:
+                    return {...state, count: state.count + 1};
+                case DECREMENT:
+                    return {...state, count: state.count - 1};
+                default:
+                    return state;
+            }
+        }
+
+Step 4
+
+    Within the 'redux' folder, create 'configureStore.js'
+
+    Within it import {combineReducers, createStore} from 'redux'
+
+        The combineReducers function allows you to put all of your reducers into the one store file
+    
+    You must also import the all reducer files that you wish to use within your application, to pass into the combineReducers file
+    
+    For example, adding your counter reducer will look like this.. 
+    
+        import { combineReducers, createStore } from "redux";
+        import counterReducer from './ducks/counter'
+        
+        // * combines all your reducers to be in this one file
+        
+        const reducer = combineReducers({
+            counter: counterReducer
+        })
+        
+        
+        const store = createStore(reducer)
+        
+        export default store;
+
+    You use createStore to create a redux store using your reducer variable
+
+Step 5
+
+    You are now ready to use state variables within your components
+
+    the useSelector hook is imported from 'react-redux' in order to access state variables like so...
+
+        const count = useSelector((state) => state.counter.count)
+    
+    the useDispatch hook is used to access the actions you created in your duck / reducer file like so...
+
+        const dispatch = useDispatch()
+    
+    Then you can create your event handler functions like so...
+    note that 'increment' and 'decrement' in this case are imported directly from your duck / reducer file './redux/ducks/counter'
+
+    const handleIncrement = () => {
+        dispatch(increment())
+      }
+    
+      const handleDecrement = () => {
+        dispatch(decrement())
+      }
+
+    Your full App component may look as follows:
+
+        import './App.css';
+        import Counter from './components/Counter';
+        import { useSelector, useDispatch } from 'react-redux';
+        import {decrement, increment} from './redux/ducks/counter'
+
+        function App() {
+        const count = useSelector((state) => state.counter.count)
+        const dispatch = useDispatch()
+
+        const handleIncrement = () => {
+            dispatch(increment())
+        }
+
+        const handleDecrement = () => {
+            dispatch(decrement())
+        }
+
+        return (
+            <div className="App">
+                <h1>Total Votes: {count} </h1>
+                <div>
+                    <button onClick={handleDecrement}>decrement</button>
+                    <button onClick={handleIncrement}>increment</button>
+                </div>
+            </div>
+        );
+        }
+
+        export default App;
+
+Step 6
+
+    If you want to for example change the count in app from a child component of app
+
+    or create a count that impacts the count state within app, you can do so by using the useDispatch() hook
+    
+    for example, the following code will create a 'voter' component, which will update the count displayed in its parent component of app
+
+
+        import React, {useState} from 'react';
+        import { useSelector, useDispatch } from 'react-redux';
+        import {increment, decrement} from '../redux/ducks/counter'
+
+        const Counter = ({voter}) => {
+            const [voteCount, setVoteCount] = useState(0)
+            const dispatch = useDispatch()
+
+            const handleIncrement = () => {
+                dispatch(increment())
+                setVoteCount((prev) => prev + 1)
+            }
+
+            const handleDecrement = () => {
+                if(voteCount > 0) {
+                    dispatch(decrement())
+                    setVoteCount((prev) => prev - 1)
+                }
+            }
+
+
+        return (
+            <div>
+                <h1>Voter: {voter}</h1>
+                <h1>{voteCount}</h1>
+                <div>
+                    <button onClick={handleDecrement}>Decrement</button>
+                    <button onClick={handleIncrement}>Increment</button>
+                </div>
+            </div>
+        )
+        };
+
+        Counter.defaultProps = {
+            voter: 'Voter'
+        }
+
+        export default Counter;
+                
